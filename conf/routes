@@ -10,3 +10,8 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 # Minimun Scalar Product
 GET		/minimumScalarProduct/:input1/:input2		controllers.MinimumScalarProduct.minimumScalarProductAsync(input1: String, input2: String)
+
+
+# Web socket
+GET		/echo						controllers.Echo.processEcho
+GET		/echo.html					controllers.Echo.viewEchoPage
