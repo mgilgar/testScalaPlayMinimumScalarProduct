@@ -14,26 +14,24 @@ import play.api.libs.json.JsString
 import play.api.libs.json.JsNumber
 import play.api.libs.json.JsArray
 
-case class MinimimScalarProductResult(minScalarProduct: (Array[Int], Array[Int], Int)) 
-case class ScalarProductResult(input1: String, input2: String, firstScalarProduct: Int, minimumScalarProduct: MinimimScalarProductResult)
+case class ScalarProductItem(vector1: Array[Int], vector2: Array[Int], scalarProduct: Int) 
+case class ScalarProductResult(input1: String, input2: String, firstScalarProduct: Int, minimumScalarProduct: ScalarProductItem)
 
 
 object MinimumScalarProduct extends Controller {
 
-    
-  
   def minimumScalarProductSync(input1: String, input2: String) = Action { implicit request =>
     val result = minimumScalarProductResult(input1, input2)
 
     render {
-      case Accepts.Html() => Ok(views.html.minimumScalarProduct(result.input1, result.input2, result.firstScalarProduct, (result.minimumScalarProduct.minScalarProduct._1, result.minimumScalarProduct.minScalarProduct._2, result.minimumScalarProduct.minScalarProduct._3)))
+      case Accepts.Html() => Ok(views.html.minimumScalarProduct(result.input1, result.input2, result.firstScalarProduct, result.minimumScalarProduct))
       case Accepts.Json() => Ok(Json.obj("vector1" -> result.input1,
         "vector2" -> result.input2,
         "firstScalarProduct" -> result.firstScalarProduct,
         "minimumScalarProduct" -> Json.obj(
-          "vector1" -> result.minimumScalarProduct.minScalarProduct._1.mkString(","),
-          "vector2" -> result.minimumScalarProduct.minScalarProduct._2.mkString(","),
-          "result" -> result.minimumScalarProduct.minScalarProduct._3)))
+          "vector1" -> result.minimumScalarProduct.vector1.mkString(","),
+          "vector2" -> result.minimumScalarProduct.vector2.mkString(","),
+          "result" -> result.minimumScalarProduct.scalarProduct)))
     }
   }
 
@@ -48,17 +46,16 @@ object MinimumScalarProduct extends Controller {
     Async {
       // We are calling a method in the companion object of Future trait.
       scala.concurrent.Future.firstCompletedOf(Seq(futureResult, timeoutFuture)).map {
-        //case r: (String, String, Int, (Array[Int], Array[Int], Int)) =>
         case r: ScalarProductResult =>
           render {
-            case Accepts.Html() => Ok(views.html.minimumScalarProduct(r.input1, r.input2, r.firstScalarProduct, r.minimumScalarProduct.minScalarProduct))
+            case Accepts.Html() => Ok(views.html.minimumScalarProduct(r.input1, r.input2, r.firstScalarProduct, r.minimumScalarProduct))
             case Accepts.Json() => Ok(Json.obj("vector1" -> r.input1,
               "vector2" -> r.input2,
               "firstScalarProduct" -> r.firstScalarProduct, 
               "minimumScalarProduct" -> Json.obj(
-                "vector1" -> r.minimumScalarProduct.minScalarProduct._1.mkString(","),
-                "vector2" -> r.minimumScalarProduct.minScalarProduct._2.mkString(","),
-                "result" -> r.minimumScalarProduct.minScalarProduct._3)))
+                "vector1" -> r.minimumScalarProduct.vector1.mkString(","),
+                "vector2" -> r.minimumScalarProduct.vector2.mkString(","),
+                "result" -> r.minimumScalarProduct.scalarProduct)))
           }
         case t: String => InternalServerError(t)
       }
@@ -74,9 +71,9 @@ object MinimumScalarProduct extends Controller {
       .foldLeft(0) { (total, n) => total + n._1 * n._2 }
 
     val minScalarProduct = vector1.permutations
-      .map({ (p) => (p, vector2, scalarProduct(p, vector2)) })
-      .foldLeft(new ArrayBuffer[(Array[Int], Array[Int], Int)]) { (permutationAndScalarProduct2, p) => permutationAndScalarProduct2 += p }.minBy(_._3)
-    ScalarProductResult(input1, input2, result, MinimimScalarProductResult(minScalarProduct))
+      .map({ (p) => ScalarProductItem(p, vector2, scalarProduct(p, vector2)) })
+      .foldLeft(new ArrayBuffer[ScalarProductItem]) { (permutationAndScalarProduct2, p) => permutationAndScalarProduct2 += p }.minBy(_.scalarProduct)
+    ScalarProductResult(input1, input2, result, minScalarProduct)
   }
 
   private def scalarProduct(vector1: Array[Int], vector2: Array[Int]): Int = {
