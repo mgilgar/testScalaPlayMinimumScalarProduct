@@ -39,7 +39,7 @@ object MinimumScalarProduct extends Controller {
       scala.concurrent.Future[ScalarProductResult] {
         minimumScalarProductResult(input1, input2)
       }
-    val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops, timeout", 10000)
+    val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops, timeout", 5000)
 
     Async {
       // We are calling a method in the companion object of Future trait.
