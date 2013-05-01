@@ -34,23 +34,12 @@ case class ScalarProductResult(input1: String, input2: String, firstScalarProduc
 
 object MinimumScalarProduct extends Controller {
 
-  def minimumScalarProductSync(input1: String, input2: String) = Action { implicit request =>
-    val r = minimumScalarProductResult(input1, input2)
-
-    render {
-      case Accepts.Html() => Ok(views.html.minimumScalarProduct(r))
-      case Accepts.Json() => Ok(r.toJson)
-    }
-
-  }
-
   def minimumScalarProductAsync(input1: String, input2: String) = Action { implicit request =>
-
     val futureResult: scala.concurrent.Future[ScalarProductResult] =
       scala.concurrent.Future[ScalarProductResult] {
         minimumScalarProductResult(input1, input2)
       }
-    val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops", 5000)
+    val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops, timeout", 5000)
 
     Async {
       // We are calling a method in the companion object of Future trait.
@@ -62,6 +51,14 @@ object MinimumScalarProduct extends Controller {
           }
         case t: String => InternalServerError(t)
       }
+    }
+  }
+
+  def minimumScalarProductSync(input1: String, input2: String) = Action { implicit request =>
+    val r = minimumScalarProductResult(input1, input2)
+    render {
+      case Accepts.Html() => Ok(views.html.minimumScalarProduct(r))
+      case Accepts.Json() => Ok(r.toJson)
     }
   }
 
