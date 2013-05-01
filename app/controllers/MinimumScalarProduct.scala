@@ -25,13 +25,7 @@ object MinimumScalarProduct extends Controller {
 
     render {
       case Accepts.Html() => Ok(views.html.minimumScalarProduct(result.input1, result.input2, result.firstScalarProduct, result.minimumScalarProduct))
-      case Accepts.Json() => Ok(Json.obj("vector1" -> result.input1,
-        "vector2" -> result.input2,
-        "firstScalarProduct" -> result.firstScalarProduct,
-        "minimumScalarProduct" -> Json.obj(
-          "vector1" -> result.minimumScalarProduct.vector1.mkString(","),
-          "vector2" -> result.minimumScalarProduct.vector2.mkString(","),
-          "result" -> result.minimumScalarProduct.scalarProduct)))
+      case Accepts.Json() => Ok(toJson(result))
     }
   }
 
@@ -49,13 +43,7 @@ object MinimumScalarProduct extends Controller {
         case r: ScalarProductResult =>
           render {
             case Accepts.Html() => Ok(views.html.minimumScalarProduct(r.input1, r.input2, r.firstScalarProduct, r.minimumScalarProduct))
-            case Accepts.Json() => Ok(Json.obj("vector1" -> r.input1,
-              "vector2" -> r.input2,
-              "firstScalarProduct" -> r.firstScalarProduct, 
-              "minimumScalarProduct" -> Json.obj(
-                "vector1" -> r.minimumScalarProduct.vector1.mkString(","),
-                "vector2" -> r.minimumScalarProduct.vector2.mkString(","),
-                "result" -> r.minimumScalarProduct.scalarProduct)))
+            case Accepts.Json() => Ok(toJson(r))
           }
         case t: String => InternalServerError(t)
       }
@@ -80,6 +68,20 @@ object MinimumScalarProduct extends Controller {
     vector1
       .zip(vector2)
       .foldLeft(0) { (total, n) => total + n._1 * n._2 }
+  }
+  
+  private def toJson(scalarProductResult : ScalarProductResult) : JsObject = {
+	  Json.obj("vector1" -> scalarProductResult.input1,
+        "vector2" -> scalarProductResult.input2,
+        "firstScalarProduct" -> scalarProductResult.firstScalarProduct,
+        "minimumScalarProduct" -> toJson(scalarProductResult.minimumScalarProduct))   
+  }
+  
+  private def toJson(scalarProductItem: ScalarProductItem) : JsObject = {
+    Json.obj(
+                "vector1" -> scalarProductItem.vector1.mkString(","),
+                "vector2" -> scalarProductItem.vector2.mkString(","),
+                "result" -> scalarProductItem.scalarProduct)
   }
 
 }
