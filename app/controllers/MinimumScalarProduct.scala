@@ -38,7 +38,7 @@ object MinimumScalarProduct extends Controller {
     val r = minimumScalarProductResult(input1, input2)
 
     render {
-      case Accepts.Html() => Ok(views.html.minimumScalarProduct(r.input1, r.input2, r.firstScalarProduct, r.minimumScalarProduct))
+      case Accepts.Html() => Ok(views.html.minimumScalarProduct(r))
       case Accepts.Json() => Ok(r.toJson)
     }
 
@@ -57,18 +57,11 @@ object MinimumScalarProduct extends Controller {
       scala.concurrent.Future.firstCompletedOf(Seq(futureResult, timeoutFuture)).map {
         case r: ScalarProductResult =>
           render {
-            case Accepts.Html() => Ok(views.html.minimumScalarProduct(r.input1, r.input2, r.firstScalarProduct, r.minimumScalarProduct))
+            case Accepts.Html() => Ok(views.html.minimumScalarProduct(r))
             case Accepts.Json() => Ok(r.toJson)
           }
         case t: String => InternalServerError(t)
       }
-    }
-  }
-
-  private def renderMinimumScalarProduct(result: ScalarProductResult) = Action { implicit request =>
-    render {
-      case Accepts.Html() => Ok(views.html.minimumScalarProduct(result.input1, result.input2, result.firstScalarProduct, result.minimumScalarProduct))
-      case Accepts.Json() => Ok(result.toJson)
     }
   }
 
