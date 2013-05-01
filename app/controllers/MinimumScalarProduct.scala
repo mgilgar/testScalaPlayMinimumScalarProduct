@@ -14,19 +14,34 @@ import play.api.libs.json.JsString
 import play.api.libs.json.JsNumber
 import play.api.libs.json.JsArray
 
-case class ScalarProductItem(vector1: Array[Int], vector2: Array[Int], scalarProduct: Int) 
-case class ScalarProductResult(input1: String, input2: String, firstScalarProduct: Int, minimumScalarProduct: ScalarProductItem)
+case class ScalarProductItem(vector1: Array[Int], vector2: Array[Int], scalarProduct: Int) {
+  def toJson: JsObject = {
+    Json.obj(
+      "vector1" -> vector1.mkString(","),
+      "vector2" -> vector2.mkString(","),
+      "result" -> scalarProduct)
+  }
+}
 
+case class ScalarProductResult(input1: String, input2: String, firstScalarProduct: Int, minimumScalarProduct: ScalarProductItem) {
+  def toJson: JsObject = {
+    Json.obj("vector1" -> input1,
+      "vector2" -> input2,
+      "firstScalarProduct" -> firstScalarProduct,
+      "minimumScalarProduct" -> minimumScalarProduct.toJson)
+  }
+}
 
 object MinimumScalarProduct extends Controller {
 
   def minimumScalarProductSync(input1: String, input2: String) = Action { implicit request =>
-    val result = minimumScalarProductResult(input1, input2)
+    val r = minimumScalarProductResult(input1, input2)
 
     render {
-      case Accepts.Html() => Ok(views.html.minimumScalarProduct(result.input1, result.input2, result.firstScalarProduct, result.minimumScalarProduct))
-      case Accepts.Json() => Ok(toJson(result))
+      case Accepts.Html() => Ok(views.html.minimumScalarProduct(r.input1, r.input2, r.firstScalarProduct, r.minimumScalarProduct))
+      case Accepts.Json() => Ok(r.toJson)
     }
+
   }
 
   def minimumScalarProductAsync(input1: String, input2: String) = Action { implicit request =>
@@ -43,14 +58,21 @@ object MinimumScalarProduct extends Controller {
         case r: ScalarProductResult =>
           render {
             case Accepts.Html() => Ok(views.html.minimumScalarProduct(r.input1, r.input2, r.firstScalarProduct, r.minimumScalarProduct))
-            case Accepts.Json() => Ok(toJson(r))
+            case Accepts.Json() => Ok(r.toJson)
           }
         case t: String => InternalServerError(t)
       }
     }
   }
-  
-  private def minimumScalarProductResult(input1: String, input2: String) : ScalarProductResult = {
+
+  private def renderMinimumScalarProduct(result: ScalarProductResult) = Action { implicit request =>
+    render {
+      case Accepts.Html() => Ok(views.html.minimumScalarProduct(result.input1, result.input2, result.firstScalarProduct, result.minimumScalarProduct))
+      case Accepts.Json() => Ok(result.toJson)
+    }
+  }
+
+  private def minimumScalarProductResult(input1: String, input2: String): ScalarProductResult = {
     val vector1 = input1.split(",").map(_.toInt)
     val vector2 = input2.split(",").map(_.toInt)
 
@@ -69,19 +91,4 @@ object MinimumScalarProduct extends Controller {
       .zip(vector2)
       .foldLeft(0) { (total, n) => total + n._1 * n._2 }
   }
-  
-  private def toJson(scalarProductResult : ScalarProductResult) : JsObject = {
-	  Json.obj("vector1" -> scalarProductResult.input1,
-        "vector2" -> scalarProductResult.input2,
-        "firstScalarProduct" -> scalarProductResult.firstScalarProduct,
-        "minimumScalarProduct" -> toJson(scalarProductResult.minimumScalarProduct))   
-  }
-  
-  private def toJson(scalarProductItem: ScalarProductItem) : JsObject = {
-    Json.obj(
-                "vector1" -> scalarProductItem.vector1.mkString(","),
-                "vector2" -> scalarProductItem.vector2.mkString(","),
-                "result" -> scalarProductItem.scalarProduct)
-  }
-
 }
