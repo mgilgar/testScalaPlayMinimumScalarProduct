@@ -4,6 +4,8 @@
 //var wsUri = "ws://echo.websocket.org/"; 
 var wsUri = "ws://localhost:9000/echo";
 var output;  
+var id=Math.floor(Math.random()*11)
+var counter = 1;
 
 function init() { 
 	output = document.getElementById("output"); 
@@ -11,38 +13,47 @@ function init() {
 }  
 function testWebSocket() { 
 	websocket = new WebSocket(wsUri); 
-	websocket.onopen = function(evt) { 
-		onOpen(evt) 
-	}; 
-	
+	websocket.onopen = function(evt) { onOpen(evt) }; 
 	websocket.onclose = function(evt) { onClose(evt) }; 
 	websocket.onmessage = function(evt) { onMessage(evt) }; 
 	websocket.onerror = function(evt) { onError(evt) }; 
 }  
 function onOpen(evt) { 
 	writeToScreen("CONNECTED"); 
-	doSend("WebSocket rocks"); 
+	doSend("WebSocket rocks. I am id =  " + id); 
 }  
 function onClose(evt) { 
 	writeToScreen("DISCONNECTED"); 
 }  
 function onMessage(evt) { 
 	writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>'); 
-	websocket.close(); 
+	//websocket.close(); 
 }  
 function onError(evt) { 
 	writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data); 
-	
-	}  
+}  
+
 function doSend(message) { 
 	writeToScreen("SENT: " + message);  websocket.send(message); 
-}  
-		
+}  		
 function writeToScreen(message) { 
 	var pre = document.createElement("p"); pre.style.wordWrap = "break-word"; pre.innerHTML = message; output.appendChild(pre); 
 }  
 	
-window.addEventListener("load", init, false);  
+window.addEventListener("load", init, false);
+
+var i = window.setInterval( function(){
+		  counter++;
+		  var  now = new Date();
+		  if (counter < 10) { 
+          	doSend("WebSocket rocks. I am id =  " + id + ", it is " + now);
+          } else {
+          	writeToScreen('<p>Finishing</p>')
+          	window.clearInterval(i);
+          	websocket.close();
+          } 
+ }, 1000 );
+  
 </script>  
 <h2>WebSocket Test</h2>  
 <div id="output"></div>
