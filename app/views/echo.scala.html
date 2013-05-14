@@ -1,5 +1,6 @@
-@main("Echo page - Websocket test") {
-
+<html>
+<head></head>
+<body>
 <script language="javascript" type="text/javascript">  
 //var wsUri = "ws://echo.websocket.org/"; 
 var wsUri = "ws://localhost:9000/echo";
@@ -8,7 +9,6 @@ var id=Math.floor(Math.random()*11)
 var counter = 1;
 
 function init() { 
-	output = document.getElementById("output"); 
 	testWebSocket(); 
 }  
 function testWebSocket() { 
@@ -19,43 +19,57 @@ function testWebSocket() {
 	websocket.onerror = function(evt) { onError(evt) }; 
 }  
 function onOpen(evt) { 
-	writeToScreen("CONNECTED"); 
+	writeToScreen("CONNECTED", "#status"); 
 	doSend("WebSocket rocks. I am id =  " + id); 
 }  
 function onClose(evt) { 
-	writeToScreen("DISCONNECTED"); 
+	writeToScreen("DISCONNECTED", "#status"); 
 }  
 function onMessage(evt) { 
-	writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>'); 
+	writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>', '#receiving'); 
 	//websocket.close(); 
 }  
 function onError(evt) { 
-	writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data); 
+	writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data, '#status'); 
 }  
 
 function doSend(message) { 
-	writeToScreen("SENT: " + message);  websocket.send(message); 
+	writeToScreen("SENT: " + message, "#sending");  websocket.send(message); 
 }  		
-function writeToScreen(message) { 
-	var pre = document.createElement("p"); pre.style.wordWrap = "break-word"; pre.innerHTML = message; output.appendChild(pre); 
+function writeToScreen(message, div) { 
+	//var pre = document.createElement("p"); pre.style.wordWrap = "break-word"; pre.innerHTML = message; output.appendChild(pre);
+	$(div).html(message); 
 }  
 	
 window.addEventListener("load", init, false);
 
-var i = window.setInterval( function(){
+
+</script>
+
+<h2>WebSocket Test</h2> 
+<h3>STATUS:</h3> <div id="status"></div>
+<h3>SENDING:</h3> <div id="sending"></div>
+<h3>RECEIVING:</h3> <div id="receiving"></div>
+<div id="output"></div>
+    
+<script src="assets/javascripts/jquery-1.9.0.min.js" ></script>
+<script type="text/javascript">  
+$(document).ready(function() {
+	writeToScreen('<p>Ready and starting</p>', '#status')
+
+	var i = window.setInterval( function(){
 		  counter++;
-		  var  now = new Date();
-		  if (counter < 10) { 
-          	doSend("WebSocket rocks. I am id =  " + id + ", it is " + now);
+		  if (counter < 1000) { 
+            var  now = new Date();
+          	doSend("id =  " + id + ", it is " + now.getMilliseconds());
           } else {
-          	writeToScreen('<p>Finishing</p>')
+          	writeToScreen('<p>Finishing</p>', '#status')
           	window.clearInterval(i);
           	websocket.close();
           } 
- }, 1000 );
+ 	}, 10 );
+});
+</script> 
   
-</script>  
-<h2>WebSocket Test</h2>  
-<div id="output"></div>
-    
-}
+   </body>
+</html>
