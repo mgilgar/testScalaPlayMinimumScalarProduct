@@ -1,18 +1,15 @@
 package actors
 
-import actors._
-import akka._
-import akka.actor._
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
+import akka.actor.Actor
+import akka.actor.ActorSystem
 import akka.actor.Props
-import akka.pattern.ask
+import akka.actor.actorRef2Scala
 import akka.util.Timeout
-import controllers._
-import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.CountDownLatch
-import models._
-import scala.collection.mutable.ArrayBuffer
-import scala.concurrent._
-import ExecutionContext.Implicits.global
+import models.ScalarProductItem
 
 class ScalarProductCalculatorMaster(vector1: Array[Int], vector2: Array[Int]) extends Actor {
 

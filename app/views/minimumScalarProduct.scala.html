@@ -1,11 +1,7 @@
 @(result: ScalarProductResult)
-
 @main("Minimum Scalar Product") {
-    <h2>input1: @result.input1</h2>
-    <h2>input2: @result.input2</h2>
+    <h2>input1: @result.vector1.mkString(",")</h2>
+    <h2>input2: @result.vector2.mkString(",")</h2>
     <h2>result: @result.firstScalarProduct</h2>
     <h2>minimum scalar product: @result.minimumScalarProduct.scalarProduct</h2>
-    
-   
-    
 }

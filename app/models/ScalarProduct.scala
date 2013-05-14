@@ -14,10 +14,11 @@ case class ScalarProductItem(vector1: Array[Int], vector2: Array[Int], scalarPro
   }
 }
 
-case class ScalarProductResult(input1: String, input2: String, firstScalarProduct: Int, minimumScalarProduct: ScalarProductItem) {
+//case class ScalarProductResult(input1: String, input2: String, firstScalarProduct: Int, minimumScalarProduct: ScalarProductItem) {
+case class ScalarProductResult(vector1: Array[Int], vector2: Array[Int], firstScalarProduct: Int, minimumScalarProduct: ScalarProductItem) {
   def toJson: JsObject = {
-    Json.obj("vector1" -> input1,
-      "vector2" -> input2,
+    Json.obj("vector1" -> vector1.mkString(","),
+      "vector2" -> vector2.mkString(","),
       "firstScalarProduct" -> firstScalarProduct,
       "minimumScalarProduct" -> minimumScalarProduct.toJson)
   }

@@ -9,7 +9,10 @@ GET     /                           controllers.Application.index
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 # Minimun Scalar Product
-GET		/minimumScalarProduct/:input1/:input2		controllers.MinimumScalarProductController.minimumScalarProductUsingActors(input1: String, input2: String)
+GET		/minimumScalarProduct/usingActors/:input1/:input2		controllers.MinimumScalarProductController.minimumScalarProductUsingActors(input1: String, input2: String)
+GET		/minimumScalarProduct/usingOneActor/:input1/:input2		controllers.MinimumScalarProductController.minimumScalarProductUsingOneActor(input1: String, input2: String)
+GET		/minimumScalarProduct/sync/:input1/:input2		controllers.MinimumScalarProductController.minimumScalarProductSync(input1: String, input2: String)
+GET		/minimumScalarProduct/async/:input1/:input2		controllers.MinimumScalarProductController.minimumScalarProductAsync(input1: String, input2: String)
 
 
 # Web socket
