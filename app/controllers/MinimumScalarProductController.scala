@@ -11,6 +11,8 @@ import play.api._
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.Enumerator
 import play.api.mvc._
+import play.api.libs._
+import play.api.libs.json._
 import scala.concurrent.Await
 import scala.collection.mutable.ArrayBuffer
 import services._
@@ -41,7 +43,7 @@ object MinimumScalarProductController extends Controller {
           // TODO: I have to find a away to improve this, I should be using renderResult
           render {
             case Accepts.Html() => Ok(views.html.minimumScalarProduct(r))
-            case Accepts.Json() => Ok(r.toJson)
+            case Accepts.Json() => Ok(Json.toJson(r))
           }
         case t: String => InternalServerError(t)
       }
@@ -88,7 +90,7 @@ object MinimumScalarProductController extends Controller {
     implicit request =>
       render {
         case Accepts.Html() => Ok(views.html.minimumScalarProduct(result))
-        case Accepts.Json() => Ok(result.toJson)
+        case Accepts.Json() => Ok(Json.toJson(result))
       }
   }
 

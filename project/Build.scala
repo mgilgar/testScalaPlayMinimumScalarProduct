@@ -10,7 +10,12 @@ object ApplicationBuild extends Build {
   val appDependencies = Seq(
     // Add your project dependencies here,
     jdbc,
-    anorm
+    anorm,
+    
+    // JSON LIB
+    "net.sf.json-lib" % "json-lib" % "2.4" classifier "jdk15",
+    "xom" % "xom" % "1.2.5",
+    "org.mockito" % "mockito-all" % "1.9.5"
   )
 
 
